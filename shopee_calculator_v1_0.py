@@ -159,7 +159,7 @@ def get_exchange_rates():
 def main():
 
     # Streamlit을 활용한 UI 구성
-    st.title("Shopee 판매 가격 계산기")
+    st.title("Shopee 판매 가격 계산기_by 호영")
 
     # 환율 정보 가져오기
     st.header("실시간 환율 정보 가져오는 중...")
