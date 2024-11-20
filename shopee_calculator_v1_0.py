@@ -6,18 +6,18 @@ import requests
 # 국가별 요율 정보
 countries_data = {
     'Country': ['Singapore', 'Malaysia', 'Thailand', 'Vietnam',
-                'Philippines', 'Indonesia', 'Taiwan', 'Brazil'],
+                'Philippines', 'Taiwan', 'Brazil'],
     'Currency': ['SGD', 'MYR', 'THB', 'VND',
-                 'PHP', 'IDR', 'TWD', 'BRL'],
+                 'PHP', 'TWD', 'BRL'],
     'Shopee Commission': [0.04, 0.0432, 0.0642, 0.09,
-                          0.0448, 0.054, 0.045, 0.16],
+                          0.0448, 0.045, 0.16],
     # VAT 제거: Shopee KRSC에서 자동으로 세금이 추가되므로 별도로 계산하지 않습니다.
-    'PG Fee': [0.02] * 8
+    'PG Fee': [0.02] * 7
 }
 
 countries_df = pd.DataFrame(countries_data)
 
-# 업데이트된 무게별 배송비 구조
+# 업데이트된 무게별 배송비 구조 (인도네시아 제거)
 updated_shipping_fee_structure = {
     'Singapore': [
         (500, 5000), (1000, 7000), (1500, 9000),
@@ -42,11 +42,6 @@ updated_shipping_fee_structure = {
     'Vietnam': [
         (500, 6500), (1000, 8500), (1500, 10500),
         (2000, 12500), (2500, 14500), (3000, 16500),
-        ('above', 2000)
-    ],
-    'Indonesia': [
-        (500, 7500), (1000, 9500), (1500, 11500),
-        (2000, 13500), (2500, 15500), (3000, 17500),
         ('above', 2000)
     ],
     'Taiwan': [
@@ -156,6 +151,7 @@ def get_exchange_rates():
     except Exception as e:
         st.error("환율 정보를 가져오는 도중 오류가 발생했습니다.")
         return {}
+
 def main():
 
     # Streamlit을 활용한 UI 구성
@@ -240,7 +236,6 @@ def main():
                 st.error("모든 필드를 입력해주세요.")
     else:
         st.error("환율 정보를 가져오지 못해 계산을 진행할 수 없습니다.")
-
 
 if __name__ == "__main__":
     main()
