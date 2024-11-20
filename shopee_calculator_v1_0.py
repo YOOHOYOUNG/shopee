@@ -3,35 +3,30 @@ import math
 import streamlit as st
 import requests
 
+# 페이지 설정: 브라우저 탭 제목 설정
+st.set_page_config(page_title="쇼피 가격 계산기")
+
 # 국가별 요율 정보
 countries_data = {
-    'Country': ['Singapore', 'Malaysia', 'Thailand', 'Vietnam',
-                'Philippines', 'Taiwan', 'Brazil'],
-    'Currency': ['SGD', 'MYR', 'THB', 'VND',
-                 'PHP', 'TWD', 'BRL'],
-    'Shopee Commission': [0.04, 0.0432, 0.0642, 0.09,
-                          0.0448, 0.045, 0.16],
+    'Country': ['Singapore', 'Taiwan', 'Thailand', 'Malaysia', 'Vietnam', 'Philippines', 'Brazil'],
+    'Currency': ['SGD', 'TWD', 'THB', 'MYR', 'VND', 'PHP', 'BRL'],
+    'Shopee Commission': [0.04, 0.045, 0.0642, 0.0432, 0.09, 0.0448, 0.16],
     # VAT 제거: Shopee KRSC에서 자동으로 세금이 추가되므로 별도로 계산하지 않습니다.
     'PG Fee': [0.02] * 7
 }
 
 countries_df = pd.DataFrame(countries_data)
 
-# 업데이트된 무게별 배송비 구조 (인도네시아 제거)
+# 업데이트된 무게별 배송비 구조
 updated_shipping_fee_structure = {
     'Singapore': [
         (500, 5000), (1000, 7000), (1500, 9000),
         (2000, 11000), (2500, 13000), (3000, 15000),
         ('above', 2000)
     ],
-    'Malaysia': [
+    'Taiwan': [
         (500, 5500), (1000, 7500), (1500, 9500),
         (2000, 11500), (2500, 13500), (3000, 15500),
-        ('above', 2000)
-    ],
-    'Philippines': [
-        (500, 7000), (1000, 9000), (1500, 11000),
-        (2000, 13000), (2500, 15000), (3000, 17000),
         ('above', 2000)
     ],
     'Thailand': [
@@ -39,14 +34,19 @@ updated_shipping_fee_structure = {
         (2000, 12000), (2500, 14000), (3000, 16000),
         ('above', 2000)
     ],
+    'Malaysia': [
+        (500, 5500), (1000, 7500), (1500, 9500),
+        (2000, 11500), (2500, 13500), (3000, 15500),
+        ('above', 2000)
+    ],
     'Vietnam': [
         (500, 6500), (1000, 8500), (1500, 10500),
         (2000, 12500), (2500, 14500), (3000, 16500),
         ('above', 2000)
     ],
-    'Taiwan': [
-        (500, 5500), (1000, 7500), (1500, 9500),
-        (2000, 11500), (2500, 13500), (3000, 15500),
+    'Philippines': [
+        (500, 7000), (1000, 9000), (1500, 11000),
+        (2000, 13000), (2500, 15000), (3000, 17000),
         ('above', 2000)
     ],
     'Brazil': [
@@ -210,8 +210,9 @@ def main():
                     '목표 마진 최소 판매가 (KRW)': []
                 }
 
-                # 각 국가의 현지 통화 최소 판매가를 저장할 딕셔너리 초기화
-                for currency in countries_df['Currency']:
+                # 요청하신 통화 순서로 지정
+                currency_order = ['SGD', 'TWD', 'THB', 'MYR', 'VND', 'PHP', 'BRL']
+                for currency in currency_order:
                     summary_data[currency] = []
 
                 # 상품별로 요약 데이터 생성
@@ -222,7 +223,7 @@ def main():
                     summary_data['목표 마진 최소 판매가 (KRW)'].append(
                         temp_df['목표 마진 최소 판매가 (KRW)'].iloc[0])
 
-                    for currency in countries_df['Currency']:
+                    for currency in currency_order:
                         price = temp_df[temp_df['현지 통화'] == currency][
                             '현지 통화 최소 판매가'].values[0]
                         summary_data[currency].append(price)
